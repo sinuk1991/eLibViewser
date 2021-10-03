@@ -1,0 +1,7 @@
+<?php
+	header('Content-Type:application/json; charset=utf-8');
+	$arr = array("data" => "new");
+
+	$json = json_encode($arr);
+	print_r($json);
+?>

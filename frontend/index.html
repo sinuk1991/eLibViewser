@@ -1,0 +1,246 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=900,height=1600,inital-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+	<title>eLibrary Viewer</title>
+	<link rel="stylesheet" href="/assets/css/reset.css">
+	<style>
+		@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
+		*{box-sizing:border-box;}
+		div,form,span,input,button,h1,h2,h3,h4,h5,h6{margin:0;padding:0;}
+		html,body{width:100%;height:100%;overflow:hidden;zoom:1.0;font-family: "Roboto", "Noto Sans KR", sans-serif;margin:0;padding:0;background-color:#000;}
+		div.clearfix{clear:both;}
+		div#wrap{width:100%;height:100% !important;overflow:hidden;border-radius:12px;}
+		header.elib_v_header{width:100%;height:auto;overflow:hidden;padding:40px 20px 20px 40px;}
+		header.elib_v_header.earth{background-color:#00917C;color:#fff;}
+		header.elib_v_header div.elib_v_header_body{width:100%;height:auto;overflow:hidden;text-align:right;}
+		header.elib_v_header div.elib_v_header_body div.elib_v_header_title{float:left;display:inline-block;max-width:400px;}
+		header.elib_v_header div.elib_v_header_body div.elib_v_header_timer{float:right;display:inline-block;}
+		header.elib_v_header div.elib_v_header_body span{font-weight:700;}
+		span.elib_v_sname{margin:0 auto;font-size:24pt;display:block;}
+		span.elib_v_title{margin:10px 0px 0px 0px;padding:5px 20px;border-radius:25px;background:#FFF;color:#00917C;text-transform:uppercase;font-size:14px;display:inline-block;}
+		header.elib_v_header div.elib_v_header_body div.elib_v_header_lending_status{float:right;font-size:25pt;padding:15px 25px;border-radius:30px;font-weight:bold;}
+		header.elib_v_header div.elib_v_header_body div.elib_v_header_lending_status.possible{background-color:#FFF;color:#00917C;}
+		header.elib_v_header div.elib_v_header_body div.elib_v_header_lending_status.negative{background-color:#FF6678;color:#FFF;}
+		/**/
+		section.elib_v_main{width:100%;height:calc(100% - 212px);}
+		section.elib_v_main.earth{background:#FDE8CD;}
+		section.elib_v_main.earth div.elib_v_main_body{width:100%;height:100% !important;color:#433520;font-size:15pt;line-height:200%;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_lendingView{width:100%;max-height:495px !important;padding:25px 35px 30px 35px;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_lendingView div.elib_v_lendingGroup{width:100%;height:auto !important;margin-top:25px;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_lendingView div.elib_v_lendingGroup.first{margin:0;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_lendingView div.elib_v_lendingGroup span.elib_v_lendingTitle{display:block;text-align:left;font-weight:bold;font-size:40pt;padding:10px 0px;margin-bottom:25px;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_lendingView div.elib_v_lendingGroup div.elib_v_lendingDays{width:100%;height:auto !important;text-align:center;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_lendingView div.elib_v_lendingGroup div.elib_v_lendingDays span{height:auto !important;overflow:hidden;display:inline-block;font-weight:bold;font-size:50pt;padding:35px 10px;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_lendingView div.elib_v_lendingGroup div.elib_v_lendingDays span.days{background-color:#433520;color:#FFF;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_popupnews{width:100%;height:calc(100% - 494px) !important;overflow:hidden;background:#DFE0DF;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_popupnews ul.popuplist{width:100%;height:100%;margin:0;padding:0;list-style:none;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_popupnews ul.popuplist li{margin:0;padding:0;float:left;width:100%;height:100%;}
+		section.elib_v_main.earth div.elib_v_main_body div.elib_v_popupnews ul.popuplist li img{width:100%;height:100%;}
+		/**/
+		footer.elib_v_footer{width:100%;height:auto;overflow:hidden;padding:20px 40px;}
+		footer.elib_v_footer.earth{background-color:#00917C;color:#fff;}
+		footer.elib_v_footer div.elib_v_footer_body span{display:inline-block;font-weight:700;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_weather{display:inline-block;float:left;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_weather span.elib_v_weather_icon{float:left;font-size:36pt;margin-right:15px;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_weather span.elib_v_weather_temp{font-size:24pt;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_weather span.elib_v_weather_group{float:right;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_weather span.elib_v_weather_group span{display:block;font-size:15pt;padding:2px 0px;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_weather span.elib_v_weather_group span.elib_v_weather_temp::after{content:"°C";}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer {float:right;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span{display:inline-block;font-size:36pt;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span.elib_v_timer_days{float:left;margin-right:15px;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span.elib_v_timer_daymoon{float:left;margin-right:10px;margin-top:6px;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span.elib_v_timer_daymoon span{font-size:14pt;color:#005D4F;display:block;font-style:500;padding:1px 0px;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span.elib_v_timer_daymoon span::before{content:"•";margin-right:10px;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span.elib_v_timer_daymoon span.active{color:#FFF;font-weight:700;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span.elib_v_timer_daymoon span.active::before{color:#FF6161;}
+		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span.elib_v_timer_blink{animation: blink-effect 1s step-end infinite;}
+		@keyframes blink-effect{50%{opacity:0;}}
+	</style>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+	<script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+	<script>
+		$(function() {
+			var $slider = $('ul.popuplist'),
+				$firstSlide = $slider.find('li').first().stop(true).animate({'opacity': 1}, 200);
+			function nextSlide() {
+				stopSlide();
+				startSlide();
+				$firstSlide = $slider.find('li').first().appendTo($slider);
+				var $lastSlide = $slider.find('li').last().stop(true).animate({'opacity':0}, 400);
+				$firstSlide = $slider.find('li').first().stop(true).animate({'opacity': 1}, 400)
+			}
+			function startSlide() {
+				theInterval = setInterval(nextSlide, 4000);
+			}
+			function stopSlide() {
+				clearInterval(theInterval);
+			}
+
+			function getTimer() {
+				const time = new Date();
+				const week = new Array('일', '월', '화', '수', '목', '금', '토');
+				let year = time.getFullYear();
+				let month = time.getMonth() + 1;
+				let day = time.getDate();
+				let dayLabel = time.getDay();
+				let hours = time.getHours();
+				let minutes = time.getMinutes();
+
+				
+				hours = hours < 10 ? `0${hours}` : hours;
+				minutes = minutes < 10 ? `0${minutes}` : minutes;
+				//$('.elib_v_timer_days').text(`${month}월 ${day}일 ${week[dayLabel]}`);
+				$('.elib_v_timer_hour').text(hours);
+				$('.elib_v_timer_minute').text(minutes);
+				if(hours <= 12 && hours >= 0) {
+					$('.elib_v_timer_daymoon_am').addClass('active');
+					$('.elib_v_timer_daymoon_pm').removeClass('active');
+				} else {
+					$('.elib_v_timer_daymoon_am').removeClass('active');
+					$('.elib_v_timer_daymoon_pm').addClass('active');					
+				}
+			}
+
+			function getWeatherApi() {
+
+				var weathericon_day = {
+					'01': 'wi-day-sunny',
+					'02': 'wi-day-cloudy',
+					'03': 'wi-cloud',
+					'04': 'wi-cloudy',
+					'09': 'wi-day-rain',
+					'10': 'wi-day-showers',
+					'11': 'wi-day-lightning',
+					'13': 'wi-day-snow',
+					'50': 'wi-windy'
+				};
+				var weathericon_night = {
+					'01': 'wi-night-clear',
+					'02': 'wi-night-alt-cloudy',
+					'03': 'wi-cloud',
+					'04': 'wi-cloudy',
+					'09': 'wi-night-alt-rain',
+					'10': 'wi-night-alt-showers',
+					'11': 'wi-night-alt-lightning',
+					'13': 'wi-night-snow',
+					'50': 'wi-windy'
+				};
+
+				$.getJSON('/assets/json/weather.json?city=강동구', function(data) {
+					$(data).each(function(i, field) {
+						const rcv = field.weather[0];
+						const weather = rcv.main;
+						const temp = Math.ceil(field.main.temp);
+						let icon = (rcv.icon).substr(0,2);
+						let icon_daymoon = (rcv.icon).substr(2,1);
+						icon = icon_daymoon == 'n' ? weathericon_night[icon] : weathericon_day[icon];
+						$('.elib_v_weather_icon').html(`<i class='wi ${icon}'></i>`);
+						$('.elib_v_weather_text').text(rcv.description);
+						$('.elib_v_weather_temp').text(temp);
+					})
+				})
+			}
+
+			$('documnet').ready(function() {
+				var refreshData = setInterval(function() {
+					$.ajax({
+						url: "/assets/json/getData.json",
+						dataType: 'json',
+						contentType: 'application/json',
+						success: function(data) {
+							$(data).each(function(i, field) {
+								const rcv = field.data;
+								console.log(rcv);
+								if(rcv == 'new') {
+									console.log('확인')
+								}
+							})
+						}
+					})
+				},12000);
+				var timer = setInterval(function() {
+					getTimer();
+				}, 1000)
+				getWeatherApi();
+				startSlide()
+			});
+		})
+	</script>
+</head>
+
+<body>
+	<div id="wrap">
+		<header class="elib_v_header earth">
+			<div class="elib_v_header_body">
+				<div class="elib_v_header_title">
+					<span class="elib_v_sname">서울풍성초등학교</span>
+					<span class="elib_v_title">library</span>
+				</div>
+				<div class="elib_v_header_lending_status possible">
+					대출가능
+				</div>
+			</div>
+		</header>
+		<section class="elib_v_main earth">
+			<div class="elib_v_main_body">
+				<div class="elib_v_lendingView">
+					<div class="elib_v_lendingGroup first">
+						<span class="elib_v_lendingTitle">대출일(Lending Day)</span>
+						<div class="clearfix"></div>
+						<div class="elib_v_lendingDays">
+							<span class="days lendingMonth">00</span>
+							<span>월</span>
+							<span class="days">00</span>
+							<span>일</span>
+							<span class="days">수</span>
+							<span>요일</span>
+						</div>
+					</div>
+					<div class="elib_v_lendingGroup">
+						<span class="elib_v_lendingTitle">반납일(Return Day)</span>
+						<div class="clearfix"></div>
+						<div class="elib_v_lendingDays">
+							<span class="days">00</span>
+							<span>월</span>
+							<span class="days">00</span>
+							<span>일</span>
+							<span class="days">수</span>
+							<span>요일</span>
+						</div>
+					</div>
+				</div>
+				<div class="elib_v_popupnews">
+					<ul class="popuplist">
+						<li>테스트페이지</li>
+						<li><img src="https://www.bfc1995.com/userfiles/images/%EB%B6%80%EC%B2%9C%EC%8B%9C%EC%9E%A5%EC%95%A0%EC%9D%B8%EC%B2%B4%EC%9C%A1%ED%9A%8C-%ED%8C%9D%EC%97%85.png"></li>
+					</ul>
+				</div>
+			</div>
+		</section>
+		<footer class="elib_v_footer earth">
+			<div class="elib_v_footer_body">
+				<div class="elib_v_footer_weather">
+					<span class="elib_v_weather_icon">${icon_daymoon}[${icon}]</span>
+					<span class="elib_v_weather_group">
+						<span class="elib_v_weather_text">${weather}</span>
+						<span class="elib_v_weather_temp">${temp}</span>
+					</span>
+				</div>
+				<div class="elib_v_footer_timer">
+					<span class="elib_v_timer_daymoon">
+						<span class="elib_v_timer_daymoon_am">오전</span>
+						<span class="elib_v_timer_daymoon_pm">오후</span>
+					</span>
+					<span class="elib_v_timer_hour">00</span>
+					<span class="elib_v_timer_blink">:</span>
+					<span class="elib_v_timer_minute">00</span>
+				</div>
+			</div>
+		</footer>
+	</div>
+</body>
+</html>
