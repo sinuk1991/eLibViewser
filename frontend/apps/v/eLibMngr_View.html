@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=900,height=1600,inital-scale=1.0">
+	<meta name="viewport" content="width=900,height=1600,initial-scale=1">
 	<meta http-equiv="X-UA-Compatible" content="chrome=1" />
 	<title>eLibrary Viewer</title>
 	<link rel="stylesheet" href="/assets/css/reset.css">
@@ -60,6 +60,23 @@
 		footer.elib_v_footer div.elib_v_footer_body div.elib_v_footer_timer span.elib_v_timer_blink{animation: blink-effect 1s step-end infinite;}
 		@keyframes blink-effect{50%{opacity:0;}}
 	</style>
+	<style>
+		/* Safari syntax */
+:-webkit-full-screen {
+  background-color: yellow;
+}
+
+/* IE11 syntax */
+:-ms-fullscreen {
+  background-color: yellow;
+}
+
+/* Standard syntax */
+:fullscreen {
+  background-color: yellow;
+}
+
+	</style>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
 	<script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
@@ -82,6 +99,32 @@
 	    	}
 	    })
 
+	</script>
+	<script>
+/* Get the documentElement (<html>) to display the page in fullscreen */
+	var elem = document.documentElement;
+
+/* View in fullscreen */
+function openFullscreen() {
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
+
+/* Close fullscreen */
+function closeFullscreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) { /* Safari */
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) { /* IE11 */
+    document.msExitFullscreen();
+  }
+}
 	</script>
 	<script>
 		$(function() {
@@ -187,14 +230,15 @@
 					getTimer();
 				}, 1000)
 				getWeatherApi();
-				startSlide()
+				startSlide();
+				
 			});
 		})
 	</script>
 </head>
 
 <body>
-	<div id="wrap">
+	<div id="wrap" class="fullscreen">
 		<header class="elib_v_header earth">
 			<div class="elib_v_header_body">
 				<div class="elib_v_header_title">
