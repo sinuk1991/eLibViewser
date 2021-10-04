@@ -16,9 +16,10 @@ const server = https.createServer(options, express).listen(port, () => {
 	console.log(`Listening on *: ${port}`);
 })
 
-let school = ['poongsung', 'chunil', 'gangdong', 'sangil'];
+let school = [];
 const socket_ids = [];
 let count = 0;
+let userid = {};
 
 
 const io = require("socket.io")(server, {
@@ -30,60 +31,56 @@ io.on('connection', function(socket) {
 	count++;
 	let client_id = socket.id;
 
-
 	socket.on('regClient', function(data) {
-		//let client_id = socket.id;
-		console.log(`${data} 님 접속.`);
 		let hello = socket_ids.forEach(function(item) {
-			if(item.client_name === data) {
-				socket_ids.splice(socket_ids.indexOf(data));
+			if(item.client_name == data) {
+				socket_ids.splice(socket_ids.indexOf(data), 1);
 			}
 		})
 		socket_ids.push({
 			'client_id': client_id,
 			'client_name': data.client_name,
-			'client_type': data.client_type
+			'client_type': data.client_type,
+			'client_sname': data.client_sname
 		})
 
-		if(data.client_type === 'client') {
-			io.sockets.emit('broadcast_status', 1)
+		socket.join(data.client_sname)
+
+		if(data.client_type == 'client') {
+			let master = socket_ids.find(o => (o.client_sname == data.client_sname) && (o.client_type === 'manager'));
+			if(master != undefined) io.to(master.client_id).emit('broadcast', { noti_type: 'state', message: '1'});
 		}
 
-		console.log(socket_ids)
-
-
-		//console.log(socket_ids)
-		io.sockets.emit('userlist', {users: Object.keys(socket_ids)});
 	});
 
 	socket.on('disconnect', function(data) {
-		let goodbye = socket_ids.forEach(function(item) {
-			if(item.client_id === socket.id) {
-				if(item.client_type === 'client') {
-					io.sockets.emit('broadcast_status', 0);
-				}
-				socket_ids.splice(socket_ids.indexOf(client_id), 1)
-				console.log('${item.client_name}bye!')
-			}
-		})
-		/*let obj=socket_ids.find(o => o.client_id === socket.id);
-		let aa;
-		if(obj != undefined) {
-			console.log('쌓인다')
-			aa = socket_ids.splice(socket_ids.indexOf(client_id),1);
+		let host = socket_ids.find(o => o.client_id == socket.id);
+		if(host.client_type == 'client') {
+			let master = socket_ids.find(o => (o.client_sname == host.client_sname) && (o.client_type === 'manager'));
+			if(master != undefined) io.to(master.client_id).emit('broadcast', { noti_type: 'state', message: '0'});
 		}
-		console.log(aa);*/
-
-		console.log(`현재 접속자: ${socket_ids}`)
-
-		io.sockets.emit('userlist', {users: Object.keys(socket_ids)});
+		console.log(host.client_type)
+		socket_ids.splice(socket_ids.indexOf(socket.id), 1)
 	});
 
 	socket.on('clientStatus', function(data) {
-		let obj=socket_ids.find(o => o.client_name === data);
-		if(obj != undefined) io.sockets.emit('broadcast_status', 1);
-		else io.sockets.emit('broadcast_status', 0);
+		let state_code;
+		let school_name = socket_ids.find(o => o.client_id == socket.id).client_sname;
+		let obj = socket_ids.find(o => (o.client_sname == school_name) && (o.client_type === 'client'));
 
-		console.log(obj)
+		if(obj != undefined) state_code = 1;
+		else state_code = 0;
+
+		io.to(socket.id).emit('broadcast', { noti_type: 'state', message: `${state_code}`});
+		
+	})
+
+	socket.on('changeLending', function(data) {
+		let school_name = socket_ids.find(o => o.client_id == socket.id);
+		let host = socket_ids.find(o => (o.client_sname == school_name.client_sname) && (o.client_type === 'client'));
+		let host_code = data.changeLendmode;
+		let client_id = socket.id;
+		io.to(host.client_id).emit('changeLending', data.changeLendmode);
+		io.to(socket.id).emit('broadcast', { noti_type: 'message', message: '변경 완료.'})
 	})
 })

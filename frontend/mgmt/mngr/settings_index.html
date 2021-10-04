@@ -17,46 +17,65 @@
   	.disconnect{color:#989898;}
   	.hidden{display:none}
   </style>
-  <script src="/socket.io/socket.io.js"></script>
+  <!--<script src="/socket.io/socket.io.js"></script>-->
+  <script src="https://cdn.socket.io/4.2.0/socket.io.min.js" integrity="sha384-PiBR5S00EtOj2Lto9Uu81cmoyZqR57XcOna1oAuVuIEjzj0wpqDVfD0JA9eXlRsj" crossorigin="anonymous"></script>
+
 
   <script>
     let lib_host;
-    var socket = io.connect('https://elib.vitzro.dev:12551', {
-      cors: {
-        origin: '*', 
-        methods: ["GET", "POST"],
-        credentials: true
-      },
-    });
+    try {
+      var socket = io.connect('https://elib.vitzro.dev:12551', {
+        cors: {
+          origin: '*', 
+          methods: ["GET", "POST"],
+          credentials: true
+        },
+      });
 
-    socket.emit('regClient', { client_name: 'poongsung_master', client_type: 'manager'});
-    socket.emit('clientStatus', 'client-poongsung')
-    socket.on('userlist', function(data) {
-      let users = data.users;
-      console.log(users);
-    })
-    
-    socket.on('broadcast_status', function(data) {
-      if(data == 1) {
-        lib_host = 1;
-        $('input:radio[name=postLending]').removeAttr('disabled');
-        $('#signal_text').addClass('badge-success');
-        $('#signal_text').removeClass('badge-danger');
-        $('#signal_text').text('ON');
-        $('#signal').addClass('connect');
-        $('#signal').removeClass('disconnect');
-      } else {
-        lib_host = 0;
-        console.log('err')
-        $('input:radio[name=postLending]').attr('disabled', true);
-        $('#signal_text').removeClass('badge-success');
-        $('#signal_text').addClass('badge-danger');
-        $('#signal_text').text('OFF');
-        $('#signal').removeClass('connect');
-        $('#signal').addClass('disconnect');
+      socket.emit('regClient', { client_name: 'master', client_type: 'manager', client_sname: 'poongsung'});
+      socket.emit('clientStatus', 'poongsung')
+
+      socket.on("connect_error", (error) => {
+        console.log('error')
+      });
+
+      socket.on("connect", () =>
+      {
+      })
+      
+      socket.on('message', (data) => {
+        console.log(data);
+      })
+
+      socket.on('broadcast', (data) => {
+        if(data.noti_type == "state") {
+            if(data.message == 1) {
+            lib_host = 1;
+            $('input:radio[name=postLending]').removeAttr('disabled');
+            $('#signal_text').addClass('badge-success');
+            $('#signal_text').removeClass('badge-danger');
+            $('#signal_text').text('ON');
+            $('#signal').addClass('connect');
+            $('#signal').removeClass('disconnect');
+          } else {
+            lib_host = 0;
+            $('input:radio[name=postLending]').attr('disabled', true);
+            $('#signal_text').removeClass('badge-success');
+            $('#signal_text').addClass('badge-danger');
+            $('#signal_text').text('OFF');
+            $('#signal').removeClass('connect');
+            $('#signal').addClass('disconnect');
+          }
+        }
+        console.log(`코드: ${data.noti_type}\n메시지: ${data.message}`)
+      })
+
+      function changeStatus(str) {
+        socket.emit('changeLending', { changeLendmode: str });
       }
-      console.log(data);
-    })
+    } catch(err) {
+      alert('서버접속에 실패하였습니다.')
+    }
   </script>
 </head>
 <body class="hold-transition sidebar-mini">
@@ -109,7 +128,7 @@
       <li class="nav-item">
         <a class="nav-link" href="#" role="button">
           <i id="signal" class="fas fa-signal"></i>
-          <span class="badge navbar-badge" id="signal_text"></span>
+          <span class="badge navbar-badge badge-danger" id="signal_text">off</span>
         </a>
       </li>
     </ul>
@@ -233,7 +252,7 @@
 <script src="/assets/plugins/AdminLTE/plugins/toastr/toastr.min.js"></script>
 <script>
 $('input:radio[name=postLending]').click(function() {
-    socket.emit('changeLending', { client_name: 'client-poongsung', changeLendmode: $(this).val() });
+  changeStatus($(this).val())
 })
 </script>
 </body>

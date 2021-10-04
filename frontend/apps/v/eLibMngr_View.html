@@ -79,25 +79,36 @@
 	</style>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
 	<script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-	<script src="/socket.io/socket.io.js"></script>
+	<!--<script src="/socket.io/socket.io.js"></script>-->
+	<script src="https://cdn.socket.io/4.2.0/socket.io.min.js" integrity="sha384-PiBR5S00EtOj2Lto9Uu81cmoyZqR57XcOna1oAuVuIEjzj0wpqDVfD0JA9eXlRsj" crossorigin="anonymous"></script>
 	<script>
-	    var socket = io.connect('https://elib.vitzro.dev:12551', {
-	      cors: {
-	        origin: '*', 
-	        methods: ["GET", "POST"],
-	        credentials: true
-	      }
-	    });
-	    socket.emit('regClient', {client_name: 'client-poongsung', client_type: 'client' });
-	    socket.on('changeLending', function(data) {
-	    	if(data === 0) {
-	    		$('.elib_v_header_lending_status').removeClass('possible');
-	    		$('.elib_v_header_lending_status').addClass('danger');
-	    	} else {
-	    		$('.elib_v_header_lending_status').addClass('possible');
-	    		$('.elib_v_header_lending_status').removeClass('danger');
-	    	}
-	    })
+		try {
+			var socket = io.connect('https://elib.vitzro.dev:12551', {
+				cors: {
+					origin: '*', 
+					methods: ["GET", "POST"],
+					credentials: true
+				}
+			});
+			socket.emit('regClient', {client_name: 'client', client_type: 'client', client_sname: 'poongsung' });
+			socket.on('changeLending', function(data) {
+				if(data == 0) {
+					$('#elib_v_header_lending_status').removeClass('possible');
+					$('#elib_v_header_lending_status').addClass('negative');
+					$('#elib_v_header_lending_status').text('대출불가')
+				} else {
+					$('#elib_v_header_lending_status').addClass('possible');
+					$('#elib_v_header_lending_status').removeClass('negative');
+					$('#elib_v_header_lending_status').text('대출가능')
+				}
+				console.log(data)
+			})
+			socket.on("connect", () => {
+				console.log('connected!')
+			})
+		} catch (err) {
+			console.log(err)
+		}
 
 	</script>
 	<script>
@@ -245,9 +256,7 @@ function closeFullscreen() {
 					<span class="elib_v_sname">서울풍성초등학교</span>
 					<span class="elib_v_title">library</span>
 				</div>
-				<div class="elib_v_header_lending_status possible">
-					대출가능
-				</div>
+				<div id="elib_v_header_lending_status" class="elib_v_header_lending_status possible"></div>
 			</div>
 		</header>
 		<section class="elib_v_main earth">
