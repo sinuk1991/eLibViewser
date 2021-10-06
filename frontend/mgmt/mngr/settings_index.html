@@ -73,6 +73,10 @@
       function changeStatus(str) {
         socket.emit('changeLending', { changeLendmode: str });
       }
+
+      function changeDate(str) {
+        socket.emit('changeDate', { changeDate: str });
+      }
     } catch(err) {
       alert('서버접속에 실패하였습니다.')
     }
@@ -216,6 +220,15 @@
               <div class="card-footer">
               </div>
             </div>
+            <div class="card card-primary">
+              <div class="card-header">대출기간설정</div>
+              <div class="card-body">
+                <input type="number" name="postDate" min="1" max="30" pattern="[0-9]+" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />일
+                <button type="button" name="btnDateChange" id="btnDateChange">변경</button>
+              </div>
+              <div class="card-footer">
+              </div>
+            </div>
           </div>
 
       </div><!-- /.container-fluid -->
@@ -253,6 +266,9 @@
 <script>
 $('input:radio[name=postLending]').click(function() {
   changeStatus($(this).val())
+})
+$('#btnDateChange').click(function() {
+  changeDate($('input[name=postDate]').val());
 })
 </script>
 </body>

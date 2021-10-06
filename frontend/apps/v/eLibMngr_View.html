@@ -82,34 +82,9 @@
 	<!--<script src="/socket.io/socket.io.js"></script>-->
 	<script src="https://cdn.socket.io/4.2.0/socket.io.min.js" integrity="sha384-PiBR5S00EtOj2Lto9Uu81cmoyZqR57XcOna1oAuVuIEjzj0wpqDVfD0JA9eXlRsj" crossorigin="anonymous"></script>
 	<script>
-		try {
-			var socket = io.connect('https://elib.vitzro.dev:12551', {
-				cors: {
-					origin: '*', 
-					methods: ["GET", "POST"],
-					credentials: true
-				}
-			});
-			socket.emit('regClient', {client_name: 'client', client_type: 'client', client_sname: 'poongsung' });
-			socket.on('changeLending', function(data) {
-				if(data == 0) {
-					$('#elib_v_header_lending_status').removeClass('possible');
-					$('#elib_v_header_lending_status').addClass('negative');
-					$('#elib_v_header_lending_status').text('대출불가')
-				} else {
-					$('#elib_v_header_lending_status').addClass('possible');
-					$('#elib_v_header_lending_status').removeClass('negative');
-					$('#elib_v_header_lending_status').text('대출가능')
-				}
-				console.log(data)
-			})
-			socket.on("connect", () => {
-				console.log('connected!')
-			})
-		} catch (err) {
-			console.log(err)
-		}
-
+		let lend_days; // 기본값
+		const week = new Array('일', '월', '화', '수', '목', '금', '토');
+		let timer;
 	</script>
 	<script>
 /* Get the documentElement (<html>) to display the page in fullscreen */
@@ -139,6 +114,7 @@ function closeFullscreen() {
 	</script>
 	<script>
 		$(function() {
+
 			var $slider = $('ul.popuplist'),
 				$firstSlide = $slider.find('li').first().stop(true).animate({'opacity': 1}, 200);
 			function nextSlide() {
@@ -156,15 +132,28 @@ function closeFullscreen() {
 			}
 
 			function getTimer() {
-				const time = new Date();
-				const week = new Array('일', '월', '화', '수', '목', '금', '토');
+				let time = new Date();
 				let year = time.getFullYear();
 				let month = time.getMonth() + 1;
 				let day = time.getDate();
 				let dayLabel = time.getDay();
 				let hours = time.getHours();
 				let minutes = time.getMinutes();
+				let todayis = `${year}-${month}-${day} ${week[dayLabel]}`;
+				let returndays = new Date();
+				returndays.setDate(returndays.getDate() + lend_days)
 
+				$('#lend_month').text(`${month}`);
+				$('#lend_date').text(`${day}`);
+				$('#lend_day').text(`${week[dayLabel]}`);
+
+				let return_month = returndays.getMonth() + 1;
+				let return_date = returndays.getDate();
+				let return_week = week[returndays.getDay()];
+
+				$('#return_month').text(`${return_month}`);
+				$('#return_date').text(`${return_date}`);
+				$('#return_day').text(`${return_week}`);
 				
 				hours = hours < 10 ? `0${hours}` : hours;
 				minutes = minutes < 10 ? `0${minutes}` : minutes;
@@ -229,22 +218,72 @@ function closeFullscreen() {
 						success: function(data) {
 							$(data).each(function(i, field) {
 								const rcv = field.data;
-								console.log(rcv);
+								//console.log(rcv);
 								if(rcv == 'new') {
-									console.log('확인')
+									//console.log('확인')
 								}
 							})
 						}
 					})
 				},12000);
-				var timer = setInterval(function() {
+				timer = setInterval(function() {
 					getTimer();
 				}, 1000)
 				getWeatherApi();
 				startSlide();
-				
+				lend_days=7;
 			});
 		})
+	</script>
+	<script>
+		try {
+			var socket = io.connect('https://elib.vitzro.dev:12551', {
+				cors: {
+					origin: '*', 
+					methods: ["GET", "POST"],
+					credentials: true
+				}
+			});
+			socket.emit('regClient', {client_name: 'client', client_type: 'client', client_sname: 'poongsung' });
+			socket.on('changeLending', function(data) {
+				if(data == 0) {
+					$('#elib_v_header_lending_status').removeClass('possible');
+					$('#elib_v_header_lending_status').addClass('negative');
+					$('#elib_v_header_lending_status').text('대출불가')
+				} else {
+					$('#elib_v_header_lending_status').addClass('possible');
+					$('#elib_v_header_lending_status').removeClass('negative');
+					$('#elib_v_header_lending_status').text('대출가능')
+				}
+				console.log(data)
+			})
+
+			socket.on('changeDate', (data) => {
+				lend_days = Number(data);
+				let todays = new Date();
+				todays.setDate(todays.getDate()+lend_days);
+				console.log(`서버에서 수신한 메시지: ${data}`);
+				console.log(todays.getDate());
+				console.log(lend_days + '일');
+				/*returndays = new Date(time.setDate(time.getDate() + lend_days));
+				console.log(time);
+
+				let return_month = returndays.getMonth();
+				let return_date = returndays.getDate();
+				return_week = week[returndays.getDay()];
+
+				$('#return_month').text(`${return_month}`);
+				$('#return_date').text(`${return_date}`);
+				$('#return_day').text(`${return_week}`);*/
+			})
+
+			socket.on("connect", () => {
+				console.log('connected!')
+			})
+		} catch (err) {
+			console.log(err)
+		}
+
 	</script>
 </head>
 
@@ -266,11 +305,11 @@ function closeFullscreen() {
 						<span class="elib_v_lendingTitle">대출일(Lending Day)</span>
 						<div class="clearfix"></div>
 						<div class="elib_v_lendingDays">
-							<span class="days lendingMonth">00</span>
+							<span id="lend_month" class="days lendingMonth">00</span>
 							<span>월</span>
-							<span class="days">00</span>
+							<span id="lend_date" class="days">00</span>
 							<span>일</span>
-							<span class="days">수</span>
+							<span id="lend_day" class="days">수</span>
 							<span>요일</span>
 						</div>
 					</div>
@@ -278,11 +317,11 @@ function closeFullscreen() {
 						<span class="elib_v_lendingTitle">반납일(Return Day)</span>
 						<div class="clearfix"></div>
 						<div class="elib_v_lendingDays">
-							<span class="days">00</span>
+							<span id="return_month" class="days">00</span>
 							<span>월</span>
-							<span class="days">00</span>
+							<span id="return_date" class="days">00</span>
 							<span>일</span>
-							<span class="days">수</span>
+							<span id="return_day" class="days">수</span>
 							<span>요일</span>
 						</div>
 					</div>

@@ -83,4 +83,13 @@ io.on('connection', function(socket) {
 		io.to(host.client_id).emit('changeLending', data.changeLendmode);
 		io.to(socket.id).emit('broadcast', { noti_type: 'message', message: '변경 완료.'})
 	})
+
+	socket.on('changeDate', function(data) {
+		let school_name = socket_ids.find(o => o.client_id == socket.id);
+		let host = socket_ids.find(o => (o.client_sname == school_name.client_sname) && (o.client_type === 'client'));
+		let change_date = data.changeDate;
+		let client_id = socket.id;
+		io.to(host.client_id).emit('changeDate', data.changeDate);
+		io.to(socket.id).emit('broadcast', { noti_type: 'message', message: '변경 완료.'})
+	})
 })
